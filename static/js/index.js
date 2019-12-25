@@ -62,6 +62,12 @@ function initialize() {
       getHelp();
     }
   });
+  let lastIsWalking = localStorage.getItem('isWalking');
+  if (lastIsWalking === null) {
+    localStorage.setItem('isWalking', isWalking);
+  } else {
+    setWalkingState(lastIsWalking === 'true');
+  }
 }
 
 function getQuestionID() {
@@ -74,6 +80,7 @@ function setWalkingState(nextState) {
   } else {
     isWalking = nextState;
   }
+  localStorage.setItem('isWalking', isWalking);
   if (isWalking) {
     document.getElementById('WalkQuestionButton').textContent = 'SHUFFLE';
     showToast('WALKING', 500);
