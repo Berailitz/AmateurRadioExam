@@ -1,6 +1,8 @@
+const cacheName = 'offline';
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open('offline').then((cache) => {
+    caches.open(cacheName).then((cache) => {
       return Promise.all([cache.addAll(
         [
           './static/css/base.css',
@@ -24,6 +26,13 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    fetch(event.request).catch((_) => caches.match(event.request))
+    caches.match(event.request).then((cacheResponse) => {
+      return cacheResponse || fetch(event.request).then((fetchResponse) => {
+        return caches.open(cacheName).then((cache) => {
+          cache.put(event.request, fetchResponse.clone());
+          return fetchResponse;
+        });  
+      });
+    })
   );
 });
