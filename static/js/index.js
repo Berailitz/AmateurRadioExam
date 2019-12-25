@@ -2,6 +2,7 @@ import { showToast } from './base.js';
 import { initialQuestionList } from './questionList.js';
 
 let questionList;
+let isWalking = false;
 
 function waitUntilInstalled(registration) {
   return new Promise((resolve, reject) => {
@@ -51,17 +52,13 @@ function initialize() {
     }
   });
   document.addEventListener('keyup', (keyEvent) => {
-    if (keyEvent.key.toUpperCase() === 'P') {
-      updateRandomQuestion();
-    }
-  });
-  document.addEventListener('keyup', (keyEvent) => {
     if (keyEvent.key.toUpperCase() === 'W') {
-      walkQuestion();
-    }
-  });
-  document.addEventListener('keyup', (keyEvent) => {
-    if (keyEvent.key.toUpperCase() === 'H') {
+      setWalkingState(true);
+    } else if (keyEvent.key.toUpperCase() === 'S') {
+      setWalkingState(false);
+    } else if (keyEvent.key.toUpperCase() === 'P') {
+      showNextQuestion();
+    } else if (keyEvent.key.toUpperCase() === 'H') {
       getHelp();
     }
   });
@@ -71,7 +68,30 @@ function getQuestionID() {
   return parseInt(document.getElementById('QuestionTitle').value);
 }
 
-function updateRandomQuestion() {
+function setWalkingState(nextState) {
+  if (nextState === undefined) {
+    isWalking = !isWalking;
+  } else {
+    isWalking = nextState;
+  }
+  if (isWalking) {
+    document.getElementById('WalkQuestionButton').textContent = 'SHUFFLE';
+    showToast('WALKING', 500);
+  } else {
+    document.getElementById('WalkQuestionButton').textContent = 'WALK';
+    showToast('SHUFFLING', 500);
+  }
+}
+
+function showNextQuestion() {
+  if (isWalking) {
+    walkQuestion();
+  } else {
+    showRandomQuestion();
+  }
+}
+
+function showRandomQuestion() {
   chooseQuestion(Math.floor(Math.random() * questionList.length) + 1);
 }
 
@@ -84,7 +104,7 @@ function walkQuestion() {
       return;
     }
   }
-  updateRandomQuestion();
+  showRandomQuestion();
 }
 
 function chooseQuestion(questionID) {
@@ -104,7 +124,7 @@ function chooseAnswer(button) {
   const isCorrect = button.value === 'a';
   if (isCorrect) {
     showToast('正确。');
-    setTimeout(updateRandomQuestion, 1000);
+    setTimeout(showNextQuestion, 1000);
   } else {
     showToast(`错误。`);
   }
@@ -129,10 +149,10 @@ function getHelp() {
     let answerButton = document.getElementById(`Answer${i}`);
     if (answerButton.value === 'a') {
       showToast(answerButton.textContent, 2000);
-      setTimeout(updateRandomQuestion, 2000);
+      setTimeout(showNextQuestion, 2000);
       return;
     }
   }
 }
 
-export { initialize, updateRandomQuestion, chooseAnswer, walkQuestion, getHelp };
+export { initialize, showNextQuestion, chooseAnswer, setWalkingState, getHelp };
