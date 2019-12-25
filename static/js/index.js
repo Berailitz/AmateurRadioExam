@@ -34,7 +34,7 @@ function updateQuestionButton(questionID) {
   }
 }
 
-function initializeQuestionTable() {
+function initialize() {
   questionList = initialQuestionList;
   QuestionList.innerHTML = questionList.map((_, questionIndex) => `<button id="Question${questionIndex + 1}" class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect">${questionIndex + 1}</button>`).join('');
   questionList.forEach((_, questionIndex) => updateQuestionButton(questionIndex + 1));
@@ -50,10 +50,36 @@ function initializeQuestionTable() {
       chooseAnswer(document.getElementById(`Answer${code - 97}`));
     }
   });
+  document.addEventListener('keyup', (keyEvent) => {
+    if (keyEvent.key.toUpperCase() === 'P') {
+      updateRandomQuestion();
+    }
+  });
+  document.addEventListener('keyup', (keyEvent) => {
+    if (keyEvent.key.toUpperCase() === 'W') {
+      walkQuestion();
+    }
+  });
+  document.addEventListener('keyup', (keyEvent) => {
+    if (keyEvent.key.toUpperCase() === 'H') {
+      getHelp();
+    }
+  });
 }
 
 function updateRandomQuestion() {
-  chooseQuestion(Math.floor(Math.random() * questionList.length));
+  chooseQuestion(Math.floor(Math.random() * questionList.length) + 1);
+}
+
+function walkQuestion() {
+  for (const i of Array(questionList.length).keys()) {
+    let questionStatistic = localStorage.getItem(`Question${i + 1}`);
+    if (questionStatistic === null || parseInt(questionStatistic) <= 0) {
+      chooseQuestion(i + 1);
+      return;
+    }
+  }
+  updateRandomQuestion();
 }
 
 function chooseQuestion(questionID) {
@@ -64,13 +90,13 @@ function chooseQuestion(questionID) {
   document.getElementById('QuestionText').textContent = `${questionItem['content']}`;
   ['a', 'b', 'c', 'd'].sort(() => Math.random() - 0.5).forEach((choice, i) => {
     const button = document.getElementById(`Answer${i}`);
-    button.textContent = `${String.fromCharCode(i + 97)}.${questionItem[choice]}`;
+    button.textContent = `${String.fromCharCode(i + 65)}.${questionItem[choice]}`;
     button.value = choice;
   });
 }
 
 function chooseAnswer(button) {
-  const isCorrect = button.value == 'a';
+  const isCorrect = button.value === 'a';
   if (isCorrect) {
     showToast('正确。');
     setTimeout(updateRandomQuestion, 1000);
@@ -92,4 +118,16 @@ function updateQuestionStatistic(isCorrect) {
   updateQuestionButton(questionID);
 }
 
-export { initializeQuestionTable, updateRandomQuestion, chooseAnswer };
+function getHelp() {
+  updateQuestionStatistic(false);
+  for (const i of Array(4).keys()) {
+    let answerButton = document.getElementById(`Answer${i}`);
+    if (answerButton.value === 'a') {
+      showToast(answerButton.textContent, 2000);
+      setTimeout(updateRandomQuestion, 2000);
+      return;
+    }
+  }
+}
+
+export { initialize, updateRandomQuestion, chooseAnswer, walkQuestion, getHelp };

@@ -26,6 +26,11 @@
                             <button id="Answer2" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">C</button>
                             <button id="Answer3" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">D</button>
                         </div>
+                        <div class="mdl-card__actions mdl-card--border">
+                            <button id="PassQuestionButton" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">PASS</button>
+                            <button id="WalkQuestionButton" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">WALK</button>
+                            <button id="HelpButton" class="mdl-button mdl-js-button mdl-button--primary mdl-js-ripple-effect">HELP</button>
+                        </div>
                     </div>
                     <div class="mdl-card mdl-shadow--2dp controller-card">
                         <div class="mdl-card__title mdl-color--primary mdl-color-text--white">
@@ -45,12 +50,15 @@
             <script type="module" src="./static/js/base.js"></script>
             <script type="module" src="./static/js/questionList.js"></script>
             <script type="module">
-                import { initializeQuestionTable, updateRandomQuestion, chooseAnswer } from "./static/js/index.js";
+                import { initialize, updateRandomQuestion, chooseAnswer, walkQuestion, getHelp } from "./static/js/index.js";
                 window.onload = function(){
-                    initializeQuestionTable();
+                    initialize();
                     for (const i of Array(4).keys()) {
                         document.getElementById(`Answer${i}`).addEventListener('click', (event) => chooseAnswer(event.target));
                     };
+                    document.getElementById('PassQuestionButton').addEventListener('click', updateRandomQuestion);
+                    document.getElementById('WalkQuestionButton').addEventListener('click', walkQuestion);
+                    document.getElementById('HelpButton').addEventListener('click', getHelp);
                     updateRandomQuestion();
                 };
             </script>
