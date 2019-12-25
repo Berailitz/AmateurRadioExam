@@ -129,13 +129,13 @@ function chooseQuestion(questionID) {
 
 function chooseAnswer(button) {
   const isCorrect = button.value === 'a';
+  updateQuestionStatistic(isCorrect);
   if (isCorrect) {
+    showNextQuestion();
     showToast('正确。');
-    setTimeout(showNextQuestion, 1000);
   } else {
     showToast(`错误。`);
   }
-  updateQuestionStatistic(isCorrect);
 }
 
 function updateQuestionStatistic(isCorrect) {
