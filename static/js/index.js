@@ -155,8 +155,9 @@ function getHelp() {
   for (const i of Array(4).keys()) {
     let answerButton = document.getElementById(`Answer${i}`);
     if (answerButton.value === 'a') {
-      showToast(answerButton.textContent, 2000);
-      setTimeout(showNextQuestion, 2000);
+      let helpTimeout = 4000;
+      showToast(answerButton.textContent, helpTimeout);
+      setTimeout(showNextQuestion, helpTimeout);
       return;
     }
   }
