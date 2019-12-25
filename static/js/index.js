@@ -67,15 +67,20 @@ function initialize() {
   });
 }
 
+function getQuestionID() {
+  return parseInt(document.getElementById('QuestionTitle').value);
+}
+
 function updateRandomQuestion() {
   chooseQuestion(Math.floor(Math.random() * questionList.length) + 1);
 }
 
 function walkQuestion() {
-  for (const i of Array(questionList.length).keys()) {
-    let questionStatistic = localStorage.getItem(`Question${i + 1}`);
+  let questionAmount = questionList.length;
+  for (let questionID = (getQuestionID() + 1) % questionAmount; questionID <= questionAmount; questionID++) {
+    let questionStatistic = localStorage.getItem(`Question${questionID}`);
     if (questionStatistic === null || parseInt(questionStatistic) <= 0) {
-      chooseQuestion(i + 1);
+      chooseQuestion(questionID);
       return;
     }
   }
@@ -107,7 +112,7 @@ function chooseAnswer(button) {
 }
 
 function updateQuestionStatistic(isCorrect) {
-  const questionID = parseInt(document.getElementById('QuestionTitle').value);
+  const questionID = getQuestionID();
   let lastStatistic = localStorage.getItem(`Question${questionID}`);
   if (lastStatistic === null) {
     lastStatistic = 0;
