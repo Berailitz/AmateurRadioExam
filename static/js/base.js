@@ -1,5 +1,5 @@
 function showToast(messageText, timeout = 1000) {
-  document.getElementById('snackbar').MaterialSnackbar.showSnackbar({
+  Snackbar.MaterialSnackbar.showSnackbar({
     'message': messageText,
     'timeout': timeout,
   });
