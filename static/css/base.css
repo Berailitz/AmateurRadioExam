@@ -39,9 +39,35 @@ body
     width: 100% !important;
 }
 
-@media screen and (prefers-color-scheme: dark) {
-    :root {
-      --background-color: #121212;
-      --foreground-color: #fafafa;
+@media screen and (prefers-color-scheme: dark)
+{
+    body
+    {
+        background-color: #121212 !important;
+        color: rgb(121,85,72) !important;
     }
-  }
+    
+    .mdl-card
+    {
+        background-color: #1c1c1c !important;
+        color: rgb(121,85,72) !important;
+    }
+    
+    .mdl-card__title
+    {
+        background-color: #1c1c1c !important;
+        color: rgb(121,85,72) !important;
+    }
+    
+    .mdl-card__supporting-text, .mdl-card__actions
+    {
+        background-color: #222222 !important;
+        color: rgb(121,85,72) !important;
+    }
+    
+    .mdl-snackbar, .mdl-snackbar__text
+    {
+        background-color: #222222 !important;
+        color: rgb(121,85,72) !important;
+    }
+}
