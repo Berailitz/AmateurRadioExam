@@ -11,6 +11,7 @@ self.addEventListener('install', (event) => {
           './static/css/MaterialIcons-Regular.woff2',
           './static/js/base.js',
           './static/js/index.js',
+          './static/js/material.min.js',
           './static/js/questionList.js',
           './index.html'
         ]
@@ -24,15 +25,15 @@ self.addEventListener('install', (event) => {
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cacheResponse) => {
-      return cacheResponse || fetch(event.request).then((fetchResponse) => {
-        return caches.open(cacheName).then((cache) => {
-          cache.put(event.request, fetchResponse.clone());
-          return fetchResponse;
-        });  
-      });
-    })
-  );
+self.addEventListener('fetch', event => {
+  if (event.request.method != 'GET') return;
+  event.respondWith((async () => {
+    const cache = await caches.open(cacheName);
+    const cachedResponse = await cache.match(event.request);
+    if (cachedResponse) {
+      event.waitUntil(cache.add(event.request));
+      return cachedResponse;
+    }
+    return fetch(event.request);
+  })());
 });
