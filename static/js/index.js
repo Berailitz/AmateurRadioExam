@@ -1,8 +1,8 @@
 import { showToast } from './base.js';
-import { initialQuestionList } from './questionList.js';
+import { initialQuestionList as questionList } from './questionList.js';
 
-let questionList;
 let isWalking = false;
+let currentQuestionID;
 
 function waitUntilInstalled(registration) {
   return new Promise((resolve, reject) => {
@@ -20,28 +20,23 @@ function waitUntilInstalled(registration) {
   });
 }
 
-function updateQuestionButton(questionID) {
-  const questionButton = document.getElementById(`Question${questionID}`);
-  questionButton.addEventListener('click', (_) => chooseQuestion(questionID));
+function isQuestionAnswered(questionID) {
   const questionStatistic = localStorage.getItem(`Question${questionID}`);
-  if (questionStatistic !== null) {
-    if (parseInt(questionStatistic) > 0) {
-      questionButton.classList.remove('mdl-button--accent');
-      questionButton.classList.add('mdl-button--primary');
-    } else {
-      questionButton.classList.add('mdl-button--accent');
-      questionButton.classList.remove('mdl-button--primary');
-    }
-  }
+  return questionStatistic !== null && parseInt(questionStatistic) > 0;
 }
 
 function initialize() {
-  questionList = initialQuestionList;
-  QuestionList.innerHTML = questionList.map((_, questionIndex) => `<button id="Question${questionIndex + 1}" class="mdl-button mdl-js-button mdl-button--accent mdl-js-ripple-effect">${questionIndex + 1}</button>`).join('');
-  questionList.forEach((_, questionIndex) => updateQuestionButton(questionIndex + 1));
   navigator.serviceWorker.register('./worker.js', {
     scope: './'
   }).then(waitUntilInstalled).catch(console.log);
+  let lastIsWalking = localStorage.getItem('isWalking');
+  if (lastIsWalking === null) {
+    localStorage.setItem('isWalking', isWalking);
+  } else {
+    setWalkingState(lastIsWalking === 'true');
+  }
+  QuestionList.innerHTML = questionList.map((_, questionIndex) => `<button id="Question${questionIndex + 1}" class="mdl-button mdl-js-button mdl-js-ripple-effect ${isQuestionAnswered(questionIndex + 1) ? 'mdl-button--primary' : 'mdl-button--accent'}">${questionIndex + 1}</button>`).join('');
+  questionList.forEach((_, questionIndex) => document.getElementById(`Question${questionIndex + 1}`).addEventListener('click', (_) => chooseQuestion(questionIndex + 1)));
   document.addEventListener('keyup', (keyEvent) => {
     let code = keyEvent.keyCode;
     if (65 <= code && code <= 68) {
@@ -62,16 +57,6 @@ function initialize() {
       getHelp();
     }
   });
-  let lastIsWalking = localStorage.getItem('isWalking');
-  if (lastIsWalking === null) {
-    localStorage.setItem('isWalking', isWalking);
-  } else {
-    setWalkingState(lastIsWalking === 'true');
-  }
-}
-
-function getQuestionID() {
-  return parseInt(document.getElementById('QuestionTitle').value);
 }
 
 function setWalkingState(nextState) {
@@ -82,10 +67,10 @@ function setWalkingState(nextState) {
   }
   localStorage.setItem('isWalking', isWalking);
   if (isWalking) {
-    document.getElementById('WalkQuestionButton').textContent = 'SHUFFLE';
+    WalkQuestionButton.textContent = 'SHUFFLE';
     showToast('WALKING', 500);
   } else {
-    document.getElementById('WalkQuestionButton').textContent = 'WALK';
+    WalkQuestionButton.textContent = 'WALK';
     showToast('SHUFFLING', 500);
   }
 }
@@ -104,7 +89,7 @@ function showRandomQuestion() {
 
 function walkQuestion() {
   let questionAmount = questionList.length;
-  for (let questionID = (getQuestionID() + 1) % questionAmount; questionID <= questionAmount; questionID++) {
+  for (let questionID = (currentQuestionID + 1) % questionAmount; questionID <= questionAmount; questionID++) {
     let questionStatistic = localStorage.getItem(`Question${questionID}`);
     if (questionStatistic === null || parseInt(questionStatistic) <= 0) {
       chooseQuestion(questionID);
@@ -116,10 +101,9 @@ function walkQuestion() {
 
 function chooseQuestion(questionID) {
   let questionItem = questionList[questionID - 1];
-  const questionTitle = document.getElementById('QuestionTitle');
-  questionTitle.textContent = `第${questionItem['localID']}题`;
-  questionTitle.value = questionItem['localID'];
-  document.getElementById('QuestionText').textContent = `${questionItem['content']}`;
+  QuestionTitle.textContent = `第${questionItem['localID']}题`;
+  currentQuestionID = questionItem['localID'];
+  QuestionText.textContent = `${questionItem['content']}`;
   ['a', 'b', 'c', 'd'].sort(() => Math.random() - 0.5).forEach((choice, i) => {
     const button = document.getElementById(`Answer${i}`);
     button.textContent = `${String.fromCharCode(i + 65)}.${questionItem[choice]}`;
@@ -139,15 +123,21 @@ function chooseAnswer(button) {
 }
 
 function updateQuestionStatistic(isCorrect) {
-  const questionID = getQuestionID();
-  let lastStatistic = localStorage.getItem(`Question${questionID}`);
+  const questionButton = document.getElementById(`Question${currentQuestionID}`);
+  let lastStatistic = localStorage.getItem(`Question${currentQuestionID}`);
   if (lastStatistic === null) {
     lastStatistic = 0;
   } else {
     lastStatistic = parseInt(lastStatistic);
   }
-  localStorage.setItem(`Question${questionID}`, lastStatistic + (isCorrect ? 1 : -1));
-  updateQuestionButton(questionID);
+  localStorage.setItem(`Question${currentQuestionID}`, lastStatistic + (isCorrect ? 1 : -1));
+  if (isQuestionAnswered(currentQuestionID)) {
+    questionButton.classList.remove('mdl-button--accent');
+    questionButton.classList.add('mdl-button--primary');
+  } else {
+    questionButton.classList.add('mdl-button--accent');
+    questionButton.classList.remove('mdl-button--primary');
+  }
 }
 
 function getHelp() {

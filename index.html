@@ -58,9 +58,9 @@
                 for (const i of Array(4).keys()) {
                     document.getElementById(`Answer${i}`).addEventListener('click', (event) => chooseAnswer(event.target));
                 };
-                document.getElementById('PassQuestionButton').addEventListener('click', showNextQuestion);
-                document.getElementById('WalkQuestionButton').addEventListener('click', (_) => setWalkingState());
-                document.getElementById('HelpButton').addEventListener('click', getHelp);
+                PassQuestionButton.addEventListener('click', showNextQuestion);
+                WalkQuestionButton.addEventListener('click', (_) => setWalkingState());
+                HelpButton.addEventListener('click', getHelp);
                 showNextQuestion();
             });
         </script>
