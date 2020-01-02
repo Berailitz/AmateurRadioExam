@@ -89,7 +89,8 @@ function showRandomQuestion() {
 
 function walkQuestion() {
   let questionAmount = questionList.length;
-  for (let questionID = (currentQuestionID + 1) % questionAmount; questionID <= questionAmount; questionID++) {
+  for (let loopQuestionIndex = currentQuestionID; loopQuestionIndex <= currentQuestionID + questionAmount; loopQuestionIndex++) {
+    let questionID = loopQuestionIndex % questionAmount + 1;
     let questionStatistic = localStorage.getItem(`Question${questionID}`);
     if (questionStatistic === null || parseInt(questionStatistic) <= 0) {
       chooseQuestion(questionID);
