@@ -29,7 +29,7 @@ function initialize() {
   navigator.serviceWorker.register('./worker.js', {
     scope: './'
   }).then(waitUntilInstalled).catch(console.log);
-  let lastIsWalking = localStorage.getItem('isWalking');
+  const lastIsWalking = localStorage.getItem('isWalking');
   if (lastIsWalking === null) {
     localStorage.setItem('isWalking', isWalking);
   } else {
@@ -88,10 +88,10 @@ function showRandomQuestion() {
 }
 
 function walkQuestion() {
-  let questionAmount = questionList.length;
+  const questionAmount = questionList.length;
   for (let loopQuestionIndex = currentQuestionID; loopQuestionIndex <= currentQuestionID + questionAmount; loopQuestionIndex++) {
-    let questionID = loopQuestionIndex % questionAmount + 1;
-    let questionStatistic = localStorage.getItem(`Question${questionID}`);
+    const questionID = loopQuestionIndex % questionAmount + 1;
+    const questionStatistic = localStorage.getItem(`Question${questionID}`);
     if (questionStatistic === null || parseInt(questionStatistic) <= 0) {
       chooseQuestion(questionID);
       return;
@@ -101,7 +101,7 @@ function walkQuestion() {
 }
 
 function chooseQuestion(questionID) {
-  let questionItem = questionList[questionID - 1];
+  const questionItem = questionList[questionID - 1];
   QuestionTitle.textContent = `第${questionItem['localID']}题`;
   currentQuestionID = questionItem['localID'];
   QuestionText.textContent = `${questionItem['content']}`;
@@ -144,9 +144,9 @@ function updateQuestionStatistic(isCorrect) {
 function getHelp() {
   updateQuestionStatistic(false);
   for (const i of Array(4).keys()) {
-    let answerButton = document.getElementById(`Answer${i}`);
+    const answerButton = document.getElementById(`Answer${i}`);
     if (answerButton.value === 'a') {
-      let helpTimeout = 4000;
+      const helpTimeout = 4000;
       showToast(answerButton.textContent, helpTimeout);
       setTimeout(showNextQuestion, helpTimeout);
       return;
