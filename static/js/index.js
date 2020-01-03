@@ -156,7 +156,11 @@ function getHelp() {
 
 function resetStatistic() {
   questionList.map((_, questionIndex) => {
-    localStorage.removeItem(`Question${questionIndex + 1}`);
+    const questionID = questionIndex + 1;
+    const questionButton = document.getElementById(`Question${questionID}`);
+    localStorage.removeItem(`Question${questionID}`);
+    questionButton.classList.add('mdl-button--accent');
+    questionButton.classList.remove('mdl-button--primary');
   });
   showToast('初始化统计数据', 1500);
 }
