@@ -154,4 +154,11 @@ function getHelp() {
   }
 }
 
-export { initialize, showNextQuestion, chooseAnswer, setWalkingState, getHelp };
+function resetStatistic() {
+  questionList.map((_, questionIndex) => {
+    localStorage.removeItem(`Question${questionIndex + 1}`);
+  });
+  showToast('初始化统计数据', 1500);
+}
+
+export { initialize, showNextQuestion, chooseAnswer, setWalkingState, getHelp, resetStatistic };
